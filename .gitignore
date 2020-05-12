@@ -3,3 +3,4 @@ geckodriver.log
 .vscode
 __pycache__
 *.pyc
+my.code-workspace
