@@ -44,7 +44,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element_by_id('id_new_item')
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
-            'Enter a to-do item',
+            'Start a To-Do list',
         )
 
         # She types "Buy peacock feathers" into a text box (Edith's hobby
@@ -70,13 +70,10 @@ class NewVisitorTest(LiveServerTestCase):
         # Edith starts a new list
         self.browser.get(self.live_server_url)
         input_element = self.browser.find_element_by_id('id_new_item')
-        # The list is initially empty
-        table = self.browser.find_element_by_id('id_list_table')
-        self.assertEqual([],table.find_elements_by_tag_name('tr'))
-
         input_element.send_keys("Edith's task #1")
         input_element.send_keys(Keys.ENTER)
-
+        
+        # The list is initially empty
         self.wait_for_row_in_list_table("1: Edith's task #1")
         # She notices that her list has a unique URL
         edith_list_url = self.browser.current_url
