@@ -8,7 +8,9 @@ MAX_WAIT = 5
 
 class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        options = webdriver.firefox.options.Options()
+        options.headless = True
+        self.browser = webdriver.Firefox(options=options)
 
     def tearDown(self):
         self.browser.quit()
@@ -44,7 +46,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element_by_id('id_new_item')
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
-            'Start a To-Do list',
+            'Enter a to-do item',
         )
 
         # She types "Buy peacock feathers" into a text box (Edith's hobby
