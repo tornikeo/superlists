@@ -90,7 +90,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
         ## We use a new browser session to make sure that no information
         ## of Edith's is coming throught from cookies, etc.
         self.browser.quit()
-        self.browser = webdriver.Firefox()
+
+        options = webdriver.firefox.options.Options()
+        options.headless = True
+        self.browser = webdriver.Firefox(options=options)
 
         # Francis visits the site. The list is empty for him.
         self.browser.get(self.live_server_url)
