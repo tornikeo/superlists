@@ -2,8 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from .base import FunctionalTest
 
-MAX_WAIT = 5
-
 class LayoutAndStylingTest(FunctionalTest):
     def test_layout_and_styling(self):
         # Edith goes to the home page
