@@ -32,7 +32,6 @@ class ListViewTest(TestCase):
         self.assertNotContains(response, 'Other item 1')
         self.assertNotContains(response, 'Other item 2')
 
-class NewListTest(TestCase):
     def test_redirects_after_POST(self):
         response = self.client.post('/lists/new',data={'item_text':'A new list item'})
         new_list = List.objects.first()
@@ -76,7 +75,7 @@ class NewItemTest(TestCase):
         other_list = List.objects.create()
 
         self.client.post(
-            f'/lists/{correct_list.id}/add_item', 
+            f'/lists/{correct_list.id}/', 
             data={'item_text':'New item in existing list'}
         )
 
@@ -86,12 +85,12 @@ class NewItemTest(TestCase):
         self.assertEqual(new_item.text, 'New item in existing list')
         self.assertEqual(new_item.list, correct_list)
 
-    def test_redirects_to_list_view(self):
+    def test_POST_redirects_to_list_view(self):
         other_list = List.objects.create()
         correct_list = List.objects.create()
 
         response = self.client.post(
-            f'/lists/{correct_list.id}/add_item',
+            f'/lists/{correct_list.id}/',
             data={'item_text':'New item in existing list'},
         )
 
