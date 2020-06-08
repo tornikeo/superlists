@@ -4,8 +4,9 @@ from django.http import HttpRequest
 from lists.views import home_page
 from django.template.loader import render_to_string
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
 from django.utils.html import escape
+from unittest import skip
 
 class HomePageTest(TestCase):
     def test_uses_home_template(self):
@@ -58,6 +59,19 @@ class ListViewTest(TestCase):
         response = self.client.get(f'/lists/{list_.id}/')
         self.assertTemplateUsed(response, 'list.html')
     
+    @skip
+    def test_for_invalid_input_shows_error_on_page(self):
+        list_ = List.objects.create()
+        self.client.post(f'/lists/{list_.id}/',
+            data={'text':'Buy milk'}
+        )
+        response = self.client.post(f'/lists/{list_.id}/',
+            data={'text':'Buy milk'}
+        )
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.count(), 1)
+        self.assertContains(response, escape(DUPLICATE_ITEM_ERROR))
+
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
         self.client.post('/lists/new', data={'text':'A new list item'})
