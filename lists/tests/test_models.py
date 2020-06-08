@@ -6,37 +6,17 @@ from django.template.loader import render_to_string
 from lists.models import Item, List
 from django.core.exceptions import ValidationError
 
-class ListAndItemModelTest(TestCase):
-    def test_saving_and_retrieving_items(self):
-        # Create a new list
-        list_ = List()
-        list_.save()
-        
-        # Create list item and add it to list
-        first_item = Item()
-        first_item.text = 'First Item'
-        first_item.list = list_
-        first_item.save()
+class ItemModelTest(TestCase):
+    def test_default_text(self):
+        item = Item()
+        self.assertEqual(item.text, '')
 
-        #Create a second item and add it to list as well
-        second_item = Item()
-        second_item.text = 'Second Item'
-        second_item.list = list_
-        second_item.save()
-        
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        saved_lists = List.objects.all()
-        self.assertEqual(saved_lists.count(), 1)
-
-        first_saved = saved_items[0]
-        saved_second = saved_items[1]
-        self.assertEqual(first_saved.text, 'First Item')
-        self.assertEqual(saved_second.text, 'Second Item')
-
-        self.assertEqual(first_saved.list, list_)
-        self.assertEqual(saved_second.list, list_)
+    def test_item_is_related_to_list(self):
+        list_ = List.objects.create()
+        item = Item()
+        item.list = list_
+        item.save()
+        self.assertEqual([item], list(list_.item_set.all()))
 
     def test_cannot_save_empty_items(self):
         list_ = List.objects.create()
@@ -45,6 +25,35 @@ class ListAndItemModelTest(TestCase):
             item.save()
             item.full_clean()
 
+    def test_duplicate_items_are_invalid(self):
+        list_ = List.objects.create()
+        item1 = Item.objects.create(text="Buy milk", list=list_)
+        with self.assertRaises(ValidationError):
+            item2 = Item(text="Buy milk", list=list_)
+            item2.full_clean()
+    
+    def test_can_save_same_items_to_different_lists(self):
+        list1 = List.objects.create()
+        list2 = List.objects.create()
+        item1 = Item.objects.create(text="Buy milk", list=list1)
+        item2 = Item.objects.create(text="Buy milk", list=list2)
+        item1.full_clean() #should not rise validation error
+
+    def test_list_ordering(self):
+        list1 = List.objects.create()
+        items = [Item.objects.create(list=list1, text=str(i)) 
+            for i in range(5)
+        ]
+        self.assertEqual(
+            list(Item.objects.all()),
+            items,
+        )
+
+    def test_string_representation(self):
+        item = Item(text='some text')
+        self.assertIn('some text', str(item))
+        
+class ListModelTest(TestCase):
     def test_get_absolute_url(self):
         list_ = List.objects.create()
         self.assertEqual(list_.get_absolute_url(), f'/lists/{list_.id}/')
