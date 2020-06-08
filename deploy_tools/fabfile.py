@@ -1,12 +1,10 @@
 from fabric.contrib.files import append, exists, sed
-from fabric.api import env, local, run
+from fabric.api import env, local, run, sudo
 import random
 
 REPO_URL = 'https://github.com/tornikeo/superlists.git'
 
-
 # NOTE: To run type: fab deploy:host=USER@SERVER --sudo-password=PASSWORD
-
 
 def deploy():
     site_folder = f'/home/{env.user}/sites/{env.host}'
