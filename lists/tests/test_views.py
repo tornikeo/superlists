@@ -4,7 +4,10 @@ from django.http import HttpRequest
 from lists.views import home_page
 from django.template.loader import render_to_string
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
+from lists.forms import (
+    ItemForm, EMPTY_ITEM_ERROR, 
+    DUPLICATE_ITEM_ERROR, ExistingListItemForm,
+)
 from django.utils.html import escape
 from unittest import skip
 
@@ -59,7 +62,6 @@ class ListViewTest(TestCase):
         response = self.client.get(f'/lists/{list_.id}/')
         self.assertTemplateUsed(response, 'list.html')
     
-    @skip
     def test_for_invalid_input_shows_error_on_page(self):
         list_ = List.objects.create()
         self.client.post(f'/lists/{list_.id}/',
@@ -71,6 +73,19 @@ class ListViewTest(TestCase):
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.count(), 1)
         self.assertContains(response, escape(DUPLICATE_ITEM_ERROR))
+
+    def test_displays_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+        self.assertContains(response, 'name="text"')
+
+    def test_for_invalid_input_passes_form_to_template(self):
+        list_ = List.objects.create()
+        response = self.client.post(f'/lists/{list_.id}/',
+            data={'text':''}
+        )
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
