@@ -17,6 +17,7 @@ def deploy():
     _update_static_files(source_folder)
     _update_database(source_folder)
     _configure_nginx_and_gunicorn(source_folder)
+    _restart_services(source_folder)
 
 def _create_directory_structure_if_necessary(site_folder):
     for subfolder in ('database', 'static', 'virtualenv', 'source'):
@@ -82,3 +83,6 @@ def _configure_nginx_and_gunicorn(source_folder):
         f' systemctl enable gunicorn.{env.host} &&'
         f' systemctl start gunicorn.{env.host}',
     )
+
+def _restart_services(source_folder):
+    sudo(f'sudo systemctl restart nginx gunicorn.{env.host}')
