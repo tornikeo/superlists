@@ -25,7 +25,7 @@
 
         QUnit.testStart(() => {
             // console.log("Start test");
-            initialize();
+            window.Superlists.initialize();
         });
         QUnit.test("errors should be hidden on keypress",  (assert) => {
             // console.log("test 1");
@@ -37,7 +37,9 @@
             // console.log("test 2");
             assert.equal($('.has-error').is(':visible'), true);
         });
-
+        $(document).ready(() => {
+            window.Superlists.initialize();
+        });
     </script>
 </body>
 
