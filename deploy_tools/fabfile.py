@@ -3,6 +3,7 @@ from fabric.api import env, local, run, sudo
 import random
 
 REPO_URL = 'https://github.com/tornikeo/superlists.git'
+DEBUG = False
 
 # NOTE: To run type: fab deploy:host=USER@SERVER --sudo-password=PASSWORD
 
@@ -31,7 +32,7 @@ def _get_latest_source(source_folder):
 
 def _update_settings(source_folder, site_name):
     settings_path = source_folder + '/superlists/settings.py'
-    sed(settings_path, 'DEBUG = True', 'DEBUG = False')
+    sed(settings_path, 'DEBUG = True', f'DEBUG = {DEBUG}')
     sed(settings_path, 
         "ALLOWED_HOSTS =.+$",
         f'ALLOWED_HOSTS = ["{site_name}"]',
@@ -74,10 +75,10 @@ def _configure_nginx_and_gunicorn(source_folder):
     )
     sudo(f'sed s/SITENAME/{env.host}/g '
         f' {source_folder}/deploy_tools/gunicorn-systemd.template.service '
-        f' |  tee /etc/systemd/system/gunicorn-{env.host}.service '
+        f' |  tee /etc/systemd/system/gunicorn.{env.host}.service '
     )
     sudo(' systemctl daemon-reload && '
         ' systemctl reload nginx && '
-        f' systemctl enable gunicorn-{env.host} &&'
-        f' systemctl start gunicorn-{env.host}',
+        f' systemctl enable gunicorn.{env.host} &&'
+        f' systemctl start gunicorn.{env.host}',
     )
