@@ -30,7 +30,7 @@ class LoginTest(FunctionalTest):
 
         # It has a url link in it
         self.assertIn(
-            'Use this link to log in:',
+            'Use this link to log in',
             email.body
         )
         url_search = re.search(r'http://.+/.+$', email.body)
