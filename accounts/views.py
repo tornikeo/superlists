@@ -31,4 +31,5 @@ def login(request):
     return redirect('/')
 
 def logout(request):
-    pass
+    auth.logout(request)
+    return redirect('/')
